@@ -4,7 +4,8 @@
 
 class Store
 {
-
+    private $fillable = ['name', 'description', 'address', 'phone', 'email', 'website', 'logo', 'cover', 'lat', 'lng', 'user_id'];
+    
     public function shippingComapnies()
     {
         return $this->hasMany('ShippingCompany');
@@ -20,6 +21,7 @@ class Store
 
 class ShippingCompany
 {
+    private $fillable = ['name', 'description', 'address', 'phone', 'email', 'website', 'logo', 'cover', 'lat', 'lng', 'user_id'];
 
     public function stores()
     {
@@ -38,6 +40,24 @@ class ShippingCompany
 class Order
 {
 
+    private $fillable = [
+            'user_id',
+            'shipping_company_id',
+            'store_id',
+            'shipping_id',
+            'status',
+            'total_price',
+            'total_weight',
+            'total_quantity',
+            'total_shipping_price',
+            'total_tax',
+            'total_discount',
+            'total_final_price',
+            'payment_method',
+            'payment_status',
+            'payment_id'
+        ];
+
     public function store()
     {
         return $this->belongsTo('Store');
@@ -51,6 +71,18 @@ class Order
 
 class Shipping
 {
+    private $fillable = [ 
+        'order_id',
+        'shipping_company_id',
+        'shipping_type', // custome delivery option => 1: company, 2: custom delivery 3: pickup
+        'tracking_code',
+        'shipping_price',
+        'shipping_weight',
+        'shipping_weight_unit',
+        'shipping_quantity',
+        'shipping_address',
+        'status'
+    ];
 
     public function shippingComapny()
     {
