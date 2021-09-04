@@ -8,7 +8,7 @@ class Store
     
     public function shippingComapnies()
     {
-        return $this->hasMany('ShippingCompany');
+        return $this->belongsToMany('ShippingCompany',"shipping_store")->withPivot('fees');
     }
 
     public function orders()
@@ -25,7 +25,7 @@ class ShippingCompany
 
     public function stores()
     {
-        return $this->belongsToMany('Store');
+        return $this->belongsToMany( 'Store', "shipping_store")->withPivot('fees');
     }
 
     public function shippings()
@@ -42,9 +42,9 @@ class Order
 
     private $fillable = [
             'user_id',
-            'shipping_company_id',
+            'shipping_company_id', //nullable
             'store_id',
-            'shipping_id',
+            'shipping_id', //
             'status',
             'total_price',
             'total_weight',
@@ -93,5 +93,49 @@ class Shipping
     {
         return $this->belongsTo('Order');
     }
+
+
+    public function booted(){
+        parent::booted();
+
+        static::Saved(function ($model) { //in create and update 
+            if ($model->wasChanged('status') && $model->status == 'ready') {
+                dispatch(new Shipment($model));
+            }
+        });
+
+    } 
+
+    //send shippment request after ready to change shhipping status in the company side //event drivent development 
+
+
+
+
+
      
+}
+
+class City 
+{
+
+    private $fillable = ['name', 'lat', 'lng', 'country_id'];
+
+
+    public function country()
+    {
+        return $this->belongsTo('Country');
+    }
+
+    public function shippingCompanies()
+    {
+        return $this->belongsToMany('ShippingCompany');
+    }
+
+    public function stores()
+    {
+        return $this->belongsToMany('Store');
+    }
+
+  
+
 }
