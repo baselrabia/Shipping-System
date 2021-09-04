@@ -6,7 +6,7 @@ interface ShippingContract
     public function doLogic($request);
 }
 
-interface anotherLogicContract
+interface AnotherLogicContract
 {
      public function anotherlogic($request);
 }
@@ -19,7 +19,7 @@ class XShipping implements ShippingContract {
     }
 }
 
-class YShipping implements ShippingContract, anotherLogicContract {
+class YShipping implements ShippingContract, AnotherLogicContract {
     public function doLogic($request)
     { 
         // code here
