@@ -34,7 +34,7 @@ By looking at the models file `Models.php` we can see the layers between the sto
 
 #### also, there's another solution despite the first one,
 
-we can create  a table that had city_id, store_id, company_id so from this table we can know the subset that the store covers from the cities that supported by the shipping company 
+we can create  a table that had `city_id`, `store_id`, `company_id` so from this table we can know the subset that the store covers from the cities that supported by the shipping company 
 
 <hr>
 
