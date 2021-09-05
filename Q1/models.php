@@ -1,6 +1,6 @@
 <?php
 
-
+## --------------------- STORE MODEL ------------------------
 
 class Store
 {
@@ -8,7 +8,7 @@ class Store
     
     public function shippingComapnies()
     {
-        return $this->belongsToMany('ShippingCompany',"shipping_store")->withPivot('fees');
+        return $this->belongsToMany('ShippingCompany', "shippingCompany_store")->withPivot('fees');
     }
 
     public function orders()
@@ -18,6 +18,7 @@ class Store
 }
 
 
+## --------------------- Shipping Company MODEL  ------------------
 
 class ShippingCompany
 {
@@ -25,7 +26,7 @@ class ShippingCompany
 
     public function stores()
     {
-        return $this->belongsToMany( 'Store', "shipping_store")->withPivot('fees');
+        return $this->belongsToMany( 'Store', "shippingCompany_store")->withPivot('fees');
     }
 
     public function shippings()
@@ -35,6 +36,8 @@ class ShippingCompany
     
 }
  
+
+## --------------------- Order MODEL ------------------------
 
 
 class Order
@@ -55,7 +58,8 @@ class Order
             'total_final_price',
             'payment_method',
             'payment_status',
-            'payment_id'
+            'payment_id',
+            'extra' //json
         ];
 
     public function store()
@@ -69,11 +73,16 @@ class Order
     }
 }
 
+
+
+## --------------------- Shipping MODEL ------------------------
+
+
 class Shipping
 {
     private $fillable = [ 
         'order_id',
-        'shipping_company_id',
+        'shipping_company_id', //nullable
         'shipping_type', // custome delivery option => 1: company, 2: custom delivery 3: pickup
         'tracking_code',
         'shipping_price',
@@ -83,6 +92,22 @@ class Shipping
         'shipping_address',
         'status'
     ];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::Saved(function ($model) { //in create and update 
+            if ($model->wasChanged('status') && $model->status == 'ready') {
+                dispatch(new ReadyShipmentEvent($model));
+            }
+        });
+
+        // whenever order shipping is being ready the "ReadyShipmentEvent" will be dispatched
+        // and the "ReadyShipmentlistener" will send the reuest to the the shipping company to create shipment from their side 
+
+    } 
+
 
     public function shippingComapny()
     {
@@ -95,25 +120,15 @@ class Shipping
     }
 
 
-    public function booted(){
-        parent::booted();
-
-        static::Saved(function ($model) { //in create and update 
-            if ($model->wasChanged('status') && $model->status == 'ready') {
-                dispatch(new Shipment($model));
-            }
-        });
-
-    } 
-
-    //send shippment request after ready to change shhipping status in the company side //event drivent development 
-
-
-
-
 
      
 }
+
+
+
+## --------------------- City MODEL ------------------------
+
+
 
 class City 
 {
@@ -136,6 +151,7 @@ class City
         return $this->belongsToMany('Store');
     }
 
-  
+ 
+
 
 }
